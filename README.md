@@ -1,5 +1,5 @@
 # data-crawling
 dump-exam crawling by selenium
 # URL : https://itexamanswers.net/
-# LANGUAGE : PYOHON
+# LANGUAGE : PYTHON
 # API : SELENIUM
