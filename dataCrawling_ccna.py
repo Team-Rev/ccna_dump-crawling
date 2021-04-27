@@ -16,6 +16,9 @@ exam = []
 answer = []
 question = []
 
+main_category = ''
+sub_category = ''
+
 path_to_extension = r'C:\Users\User\Desktop\3.10.2_0'
 option = Options()
 
@@ -31,8 +34,14 @@ driver.get("https://itexamanswers.net/ccna-1-v7-exam-answers-introduction-to-net
 time.sleep(1)
 driver.implicitly_wait(10)
 
+main_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/p[2]/a/strong').text
+
 element = driver.find_element_by_xpath(
-    '/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[3]/td[2]/a')
+    '/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[4]/td[2]/a')
+sub_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[4]/td[1]/a').text
+
+print(main_category)
+print(sub_category)
 time.sleep(1)
 element.click()
 driver.implicitly_wait(10)
@@ -60,8 +69,8 @@ count = 0
 for i in range(1, len(elements)+1):
     wrong_answer.append([])
     answer.append([])
-    exam.append(driver.find_element_by_css_selector(f'#wpProQuiz_299 > div.wpProQuiz_quiz > ol > li:nth-child({i}) > div.wpProQuiz_question > div').text)
-    total_answer = driver.find_elements_by_css_selector(f'#wpProQuiz_299 > div.wpProQuiz_quiz > ol > li:nth-child({i}) > div.wpProQuiz_question > ul > li')
+    exam.append(driver.find_element_by_css_selector(f'#wpProQuiz_301 > div.wpProQuiz_quiz > ol > li:nth-child({i}) > div.wpProQuiz_question > div').text)
+    total_answer = driver.find_elements_by_css_selector(f'#wpProQuiz_301 > div.wpProQuiz_quiz > ol > li:nth-child({i}) > div.wpProQuiz_question > ul > li')
     for j in range(0, len(total_answer)):
         get_class = total_answer[j].get_attribute('class')
         if get_class == 'wpProQuiz_questionListItem':
@@ -113,11 +122,18 @@ question.append(exam)
 question.append(wrong_answer)
 question.append(answer)
 
-question_np = np.array(question, dtype=object)
+sub_category = sub_category.split(':')[0]
+question_name = f'{sub_category}_question.csv'
+wrong_name = f'{sub_category}_wrong.csv'
+right_name = f'{sub_category}_right.csv'
 
-question_list = {"exam": [question[0]], "wrong_answer": [question[1]], "answer": [question[2]]}
-question_pd = pd.DataFrame(question_list)
-question_pd.to_csv("./question.csv")
-ccna_1_3 = db.Question(exam, wrong_answer, answer)
-ccna_1_3.writeCSV('hi.csv')
-ccna_1_3.insertDB('hi.csv')
+#
+ccna_1_3 = db.Question(exam, main_category, sub_category, wrong_answer, answer)
+ccna_1_3.write_question_CSV(question_name)
+ccna_1_3.write_wrong_choice_CSV(wrong_name)
+ccna_1_3.write_right_choice_CSV(right_name)
+
+
+ccna_1_3.insert_question_DB(question_name)
+ccna_1_3.insert_choice_DB(wrong_name)
+ccna_1_3.insert_choice_DB(right_name)
