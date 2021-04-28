@@ -37,8 +37,8 @@ driver.implicitly_wait(10)
 main_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/p[2]/a/strong').text
 
 element = driver.find_element_by_xpath(
-    '/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[4]/td[2]/a')
-sub_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[4]/td[1]/a').text
+    '/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[5]/td[2]/a')
+sub_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[5]/td[1]/a').text
 
 print(main_category)
 print(sub_category)
@@ -69,8 +69,8 @@ count = 0
 for i in range(1, len(elements)+1):
     wrong_answer.append([])
     answer.append([])
-    exam.append(driver.find_element_by_css_selector(f'#wpProQuiz_301 > div.wpProQuiz_quiz > ol > li:nth-child({i}) > div.wpProQuiz_question > div').text)
-    total_answer = driver.find_elements_by_css_selector(f'#wpProQuiz_301 > div.wpProQuiz_quiz > ol > li:nth-child({i}) > div.wpProQuiz_question > ul > li')
+    exam.append(driver.find_element_by_xpath(f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li[{i}]/div[3]/div').text)
+    total_answer = driver.find_elements_by_xpath(f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li[{i}]/div[3]/ul/li')
     for j in range(0, len(total_answer)):
         get_class = total_answer[j].get_attribute('class')
         if get_class == 'wpProQuiz_questionListItem':
@@ -79,17 +79,28 @@ for i in range(1, len(elements)+1):
             answer[count].append(total_answer[j].text)
     count+=1
 
-for i in range(len(exam)):
-    p = re.compile('^[Match|Refer|Open]', flags=re.MULTILINE)
+temp = driver.find_elements_by_xpath(f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li/div[3]/div')
+
+for i in range(len(temp)):
     try:
-        temp = exam[i]
-        m = p.match(temp)
-        if m:
-            exam.pop(i)
-            wrong_answer.pop(i)
-            answer.pop(i)
+        img_exam = driver.find_element_by_xpath(f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li{i+1}/div[3]/div/img')
+        exam.pop(i)
+        wrong_answer.pop(i)
+        answer.pop(i)
     except:
-        break # 이미지 문제 제거 작업(1)
+        continue
+
+# for i in range(len(exam)):
+#     p = re.compile('^[Match|Refer|Open]', flags=re.MULTILINE)
+#     try:
+#         temp = exam[i]
+#         m = p.match(temp)
+#         if m:
+#             exam.pop(i)
+#             wrong_answer.pop(i)
+#             answer.pop(i)
+#     except:
+#         continue # 이미지 문제 제거 작업(1)
 
 for i in range(len(wrong_answer)):
     p = re.compile('^[\d.*]')
@@ -127,13 +138,30 @@ question_name = f'{sub_category}_question.csv'
 wrong_name = f'{sub_category}_wrong.csv'
 right_name = f'{sub_category}_right.csv'
 
+for i in range(len(exam)):
+    pointer = str(exam[i]).find("\n")
+    if pointer > 0:
+        main_exam = ''
+        splited_exam = str(exam[i]).split("\n")
+        main_exam = splited_exam[0]
+        splited_exam = splited_exam[1:]
+        prompt_exam = ''
+
+        for j in range(len(splited_exam)):
+            prompt_exam = prompt_exam+'</br>'+str(splited_exam[j])
+        prompt_exam = prompt_exam[5:]
+        prompt_exam = '<prompt>'+str(prompt_exam)+'</prompt>'
+        exam[i] = main_exam+prompt_exam
+
+
+
 #
 ccna_1_3 = db.Question(exam, main_category, sub_category, wrong_answer, answer)
 ccna_1_3.write_question_CSV(question_name)
 ccna_1_3.write_wrong_choice_CSV(wrong_name)
 ccna_1_3.write_right_choice_CSV(right_name)
 
-
-ccna_1_3.insert_question_DB(question_name)
-ccna_1_3.insert_choice_DB(wrong_name)
-ccna_1_3.insert_choice_DB(right_name)
+#
+# ccna_1_3.insert_question_DB(question_name)
+# ccna_1_3.insert_choice_DB(wrong_name)
+# ccna_1_3.insert_choice_DB(right_name)
