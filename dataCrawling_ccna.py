@@ -64,34 +64,71 @@ element.click()
 driver.implicitly_wait(10)
 
 elements = driver.find_elements_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li')
-
-count = 0
-for i in range(1, len(elements)+1):
+bias = 1
+cnt = 0
+for i in elements:
     wrong_answer.append([])
     answer.append([])
-    exam.append(driver.find_element_by_xpath(f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li[{i}]/div[3]/div').text)
-    total_answer = driver.find_elements_by_xpath(f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li[{i}]/div[3]/ul/li')
-    for j in range(0, len(total_answer)):
-        get_class = total_answer[j].get_attribute('class')
+    exam_text = i.find_element_by_class_name('wpProQuiz_question_text').text
+
+    answer_path = driver.find_elements_by_xpath(
+        f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li[{bias}]/div[3]/ul/li')
+    for j in answer_path:
+        get_class = j.get_attribute('class')
         if get_class == 'wpProQuiz_questionListItem':
-            wrong_answer[count].append(total_answer[j].text)
+            wrong_answer[cnt].append(j.text)
         else:
-            answer[count].append(total_answer[j].text)
-    count+=1
-
-temp = driver.find_elements_by_xpath(f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li/div[3]/div')
-
-for i in range(len(temp)):
+            answer[cnt].append(j.text)
     try:
-        img_exam = driver.find_element_by_xpath(f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li{i+1}/div[3]/div/img')
-        exam.pop(i)
-        wrong_answer.pop(i)
-        answer.pop(i)
-    except:
+        i.find_element_by_xpath('.//img')
         continue
+    except:
+        p = re.compile('^[Match|Open]', flags=re.MULTILINE)
+        p2 = re.compile('^[Refer]', flags=re.MULTILINE)
+        # p2 = re.compile('^[Refer]', flags=re.MULTILINE)
+        m = p.match(exam_text)
+        m2 = p2.match(exam_text)
+        if m:
+            wrong_answer.pop(cnt)
+            answer.pop(cnt)
+
+        elif m2:
+            pointer = str(exam_text).find('\n')
+            if pointer < 0:
+                wrong_answer.pop(cnt)
+                answer.pop(cnt)
+            else:
+                exam.append(exam_text)
+        else:
+            exam.append(exam_text)
+    cnt += 1
+    bias += 1
+
+            # for j in answer_path:
+            #     get_class = answer_path[j].get_attribute('class')
+            #     if get_class == 'wpProQuiz_questionListItem':
+            #         wrong_answer[i].append(j.text)
+            #     else:
+            #         answer[i].append(j.text)
+
+# for i in range(len(elements)):
+#     try:
+#         p = re.compile('^[Match|Open]', flags=re.MULTILINE)
+#         temp = elements[i].find_element_by_class_name('wpProQuiz_question_text').text
+#         m = p.match(temp)
+#         if m:
+#             elements.pop(i)
+#             wrong_answer.pop(i)
+#             answer.pop(i)
+#        # elements[i].find_element_by_xpath('.//img')
+#        #  elements.pop(i)
+#        #  wrong_answer.pop(i)
+#        #  answer.pop(i)
+#     except:
+#         continue
 
 # for i in range(len(exam)):
-#     p = re.compile('^[Match|Refer|Open]', flags=re.MULTILINE)
+#     p = re.compile('^[Match|Open]', flags=re.MULTILINE)
 #     try:
 #         temp = exam[i]
 #         m = p.match(temp)
@@ -101,33 +138,6 @@ for i in range(len(temp)):
 #             answer.pop(i)
 #     except:
 #         continue # 이미지 문제 제거 작업(1)
-
-for i in range(len(wrong_answer)):
-    p = re.compile('^[\d.*]')
-    try:
-        temp = wrong_answer[i][0]
-        m = p.match(temp)
-        if m:
-            continue
-        else:
-            answer.pop(i)
-            exam.pop(i)
-            wrong_answer.pop(i)
-    except:
-        break # 이미지 문제 제거 작업(2)
-
-for i in range(len(wrong_answer)):
-    for j in range(len(wrong_answer[i])):
-        temp = str(wrong_answer[i][j])
-        temp = re.sub('^[\d.*]','',temp)
-        wrong_answer[i][j] = temp[2:]
-
-for i in range(len(answer)):
-    for j in range(len(answer[i])):
-        temp = str(answer[i][j])
-        temp = re.sub('^[\d.*]','',temp)
-        answer[i][j] = temp[2:]
-
 
 question.append(exam)
 question.append(wrong_answer)
@@ -162,6 +172,6 @@ ccna_1_3.write_wrong_choice_CSV(wrong_name)
 ccna_1_3.write_right_choice_CSV(right_name)
 
 #
-# ccna_1_3.insert_question_DB(question_name)
-# ccna_1_3.insert_choice_DB(wrong_name)
-# ccna_1_3.insert_choice_DB(right_name)
+# ccna_1_3.insert_question_DB('Modules 8 – 10_question.csv')
+# ccna_1_3.insert_choice_DB('Modules 8 – 10_wrong.csv')
+# ccna_1_3.insert_choice_DB('Modules 8 – 10_right.csv')
