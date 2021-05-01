@@ -67,20 +67,31 @@ elements = driver.find_elements_by_xpath('/html/body/div[1]/div/article/div/div[
 bias = 1
 cnt = 0
 for i in elements:
-    wrong_answer.append([])
-    answer.append([])
+    print(bias)
     exam_text = i.find_element_by_class_name('wpProQuiz_question_text').text
-
     answer_path = driver.find_elements_by_xpath(
         f'/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/div[2]/div[12]/ol/li[{bias}]/div[3]/ul/li')
-    for j in answer_path:
-        get_class = j.get_attribute('class')
-        if get_class == 'wpProQuiz_questionListItem':
-            wrong_answer[cnt].append(j.text)
-        else:
-            answer[cnt].append(j.text)
+    p = re.compile('^\d[.].', flags=re.MULTILINE)
+    m = p.match(answer_path[0].text)
+    if m:
+        wrong_answer.append([])
+        answer.append([])
+        for j in answer_path:
+            del_num = str(j.text).find('.')
+            choice = str(j.text)[del_num + 2:]
+            get_class = j.get_attribute('class')
+            if get_class == 'wpProQuiz_questionListItem':
+                wrong_answer[cnt].append(choice)
+            else:
+                answer[cnt].append(choice)
+    else:
+        bias += 1
+        continue
     try:
         i.find_element_by_xpath('.//img')
+        wrong_answer.pop(cnt)
+        answer.pop(cnt)
+        bias += 1
         continue
     except:
         p = re.compile('^[Match|Open]', flags=re.MULTILINE)
@@ -91,12 +102,14 @@ for i in elements:
         if m:
             wrong_answer.pop(cnt)
             answer.pop(cnt)
+            cnt -= 1
 
         elif m2:
             pointer = str(exam_text).find('\n')
             if pointer < 0:
                 wrong_answer.pop(cnt)
                 answer.pop(cnt)
+                cnt -= 1
             else:
                 exam.append(exam_text)
         else:
@@ -148,6 +161,9 @@ question_name = f'{sub_category}_question.csv'
 wrong_name = f'{sub_category}_wrong.csv'
 right_name = f'{sub_category}_right.csv'
 
+cnt = 0
+
+
 for i in range(len(exam)):
     pointer = str(exam[i]).find("\n")
     if pointer > 0:
@@ -172,6 +188,6 @@ ccna_1_3.write_wrong_choice_CSV(wrong_name)
 ccna_1_3.write_right_choice_CSV(right_name)
 
 #
-# ccna_1_3.insert_question_DB('Modules 8 – 10_question.csv')
-# ccna_1_3.insert_choice_DB('Modules 8 – 10_wrong.csv')
-# ccna_1_3.insert_choice_DB('Modules 8 – 10_right.csv')
+ccna_1_3.insert_question_DB('Modules 8 – 10_question.csv')
+ccna_1_3.insert_choice_DB('Modules 8 – 10_wrong.csv')
+ccna_1_3.insert_choice_DB('Modules 8 – 10_right.csv')
