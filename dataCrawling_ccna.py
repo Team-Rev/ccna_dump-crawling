@@ -37,8 +37,8 @@ driver.implicitly_wait(10)
 main_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/p[2]/a/strong').text
 
 element = driver.find_element_by_xpath(
-    '/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[5]/td[2]/a')
-sub_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[5]/td[1]/a').text
+    '/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[8]/td[2]/a')
+sub_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[8]/td[1]/a').text
 
 print(main_category)
 print(sub_category)
@@ -117,41 +117,6 @@ for i in elements:
     cnt += 1
     bias += 1
 
-            # for j in answer_path:
-            #     get_class = answer_path[j].get_attribute('class')
-            #     if get_class == 'wpProQuiz_questionListItem':
-            #         wrong_answer[i].append(j.text)
-            #     else:
-            #         answer[i].append(j.text)
-
-# for i in range(len(elements)):
-#     try:
-#         p = re.compile('^[Match|Open]', flags=re.MULTILINE)
-#         temp = elements[i].find_element_by_class_name('wpProQuiz_question_text').text
-#         m = p.match(temp)
-#         if m:
-#             elements.pop(i)
-#             wrong_answer.pop(i)
-#             answer.pop(i)
-#        # elements[i].find_element_by_xpath('.//img')
-#        #  elements.pop(i)
-#        #  wrong_answer.pop(i)
-#        #  answer.pop(i)
-#     except:
-#         continue
-
-# for i in range(len(exam)):
-#     p = re.compile('^[Match|Open]', flags=re.MULTILINE)
-#     try:
-#         temp = exam[i]
-#         m = p.match(temp)
-#         if m:
-#             exam.pop(i)
-#             wrong_answer.pop(i)
-#             answer.pop(i)
-#     except:
-#         continue # 이미지 문제 제거 작업(1)
-
 question.append(exam)
 question.append(wrong_answer)
 question.append(answer)
@@ -184,10 +149,10 @@ for i in range(len(exam)):
 #
 ccna_1_3 = db.Question(exam, main_category, sub_category, wrong_answer, answer)
 ccna_1_3.write_question_CSV(question_name)
-ccna_1_3.write_wrong_choice_CSV(wrong_name)
-ccna_1_3.write_right_choice_CSV(right_name)
+ccna_1_3.write_choice_CSV(wrong_name)
+ccna_1_3.write_choice_CSV(right_name)
 
 #
-ccna_1_3.insert_question_DB('Modules 8 – 10_question.csv')
-ccna_1_3.insert_choice_DB('Modules 8 – 10_wrong.csv')
-ccna_1_3.insert_choice_DB('Modules 8 – 10_right.csv')
+# ccna_1_3.insert_question_DB('Modules 14 – 15_question.csv')
+# ccna_1_3.insert_choice_DB('Modules 14 – 15_wrong.csv')
+# ccna_1_3.insert_choice_DB('Modules 14 – 15_right.csv')
