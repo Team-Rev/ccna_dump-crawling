@@ -1,15 +1,8 @@
 from selenium import webdriver
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.keys import Keys
 import time
-import csv
 from selenium.webdriver.chrome.options import Options
 import re
-import pandas as pd
-import numpy as np
 import dbManagement.DbManagement as db
-import numpy as np
-import pandas as pd
 
 wrong_answer = []
 exam = []
@@ -30,15 +23,15 @@ chrome_options = Options()
 chrome_options.add_argument('load-extension=' + path_to_extension)
 
 driver = webdriver.Chrome()
-driver.get("https://itexamanswers.net/ccna-1-v7-exam-answers-introduction-to-networks-v7-0-itn.html/")
+driver.get("https://itexamanswers.net/ccna-2-v7-exam-answers-switching-routing-and-wireless-essentials-v7-0-srwe.html")
 time.sleep(1)
 driver.implicitly_wait(10)
 
 main_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/p[2]/a/strong').text
 
 element = driver.find_element_by_xpath(
-    '/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[8]/td[2]/a')
-sub_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[8]/td[1]/a').text
+    '/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[4]/td[2]/a')
+sub_category = driver.find_element_by_xpath('/html/body/div[1]/div/article/div/div[1]/div/div/div[3]/table[1]/tbody/tr[4]/td[1]/a').text
 
 print(main_category)
 print(sub_category)
@@ -122,9 +115,9 @@ question.append(wrong_answer)
 question.append(answer)
 
 sub_category = sub_category.split(':')[0]
-question_name = f'{sub_category}_question.csv'
-wrong_name = f'{sub_category}_wrong.csv'
-right_name = f'{sub_category}_right.csv'
+question_name = f"{main_category.replace(' ','')}_{sub_category}_question.csv"
+wrong_name = f"{main_category.replace(' ','')}_{sub_category}_wrong.csv"
+right_name = f"{main_category.replace(' ','')}_{sub_category}_right.csv"
 
 cnt = 0
 
@@ -148,11 +141,11 @@ for i in range(len(exam)):
 
 #
 ccna_1_3 = db.Question(exam, main_category, sub_category, wrong_answer, answer)
-ccna_1_3.write_question_CSV(question_name)
-ccna_1_3.write_choice_CSV(wrong_name)
-ccna_1_3.write_choice_CSV(right_name)
+# ccna_1_3.write_question_CSV(question_name)
+# ccna_1_3.write_choice_CSV(wrong_name)
+# ccna_1_3.write_choice_CSV(right_name)
 
 #
-# ccna_1_3.insert_question_DB('Modules 14 – 15_question.csv')
-# ccna_1_3.insert_choice_DB('Modules 14 – 15_wrong.csv')
-# ccna_1_3.insert_choice_DB('Modules 14 – 15_right.csv')
+ccna_1_3.insert_question_DB('CCNA2v7.0_Modules 5 – 6_question.csv')
+ccna_1_3.insert_choice_DB('CCNA2v7.0_Modules 5 – 6_wrong.csv')
+ccna_1_3.insert_choice_DB('CCNA2v7.0_Modules 5 – 6_right.csv')
